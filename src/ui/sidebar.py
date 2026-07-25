@@ -13,7 +13,7 @@ Project:
 
 import streamlit as st
 
-from src.core.constants import APP_NAME, APP_VERSION
+from src.config.constants import APP_NAME, APP_VERSION
 from src.core.session_manager import SessionManager
 from src.core.workflow_manager import WorkflowManager
 from src.core.pipeline_manager import PipelineManager

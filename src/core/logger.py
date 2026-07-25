@@ -13,7 +13,7 @@ Project:
 
 import logging
 
-from src.core.config import PROJECT_ROOT
+from src.config.config import PROJECT_ROOT
 
 
 LOGS_DIR = PROJECT_ROOT / "logs"

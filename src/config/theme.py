@@ -13,7 +13,7 @@ Project:
 
 import streamlit as st
 
-from src.core.constants import PRIMARY_COLOR
+from src.config.constants import PRIMARY_COLOR
 
 
 CSS = f"""

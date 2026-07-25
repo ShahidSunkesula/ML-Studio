@@ -1,0 +1,224 @@
+"""
+preview.py
+
+Professional Dataset Preview Component.
+
+Author:
+    Shahid
+
+Project:
+    ML Studio
+"""
+
+from io import BytesIO
+
+import pandas as pd
+import streamlit as st
+
+from src.schemas.dataset import DatasetData
+from src.ui.components.common import (
+    render_empty_state,
+    render_section_header,
+)
+
+
+def _download_preview(df: pd.DataFrame):
+    """
+    Download dataframe as CSV.
+    """
+
+    csv = df.to_csv(index=False).encode("utf-8")
+
+    st.download_button(
+        label="📥 Download Preview",
+        data=BytesIO(csv),
+        file_name="dataset_preview.csv",
+        mime="text/csv",
+        use_container_width=True,
+    )
+
+
+def render_dataset_preview(dataset: DatasetData):
+    """
+    Render professional dataset preview.
+    """
+
+    render_section_header(
+        title="Dataset Preview",
+        subtitle="Explore your uploaded dataset interactively.",
+        icon="📋",
+    )
+
+    if dataset.preview is None or dataset.preview.empty:
+
+        render_empty_state(
+            title="No Dataset Available",
+            message="Upload a dataset to preview its contents.",
+            icon="📂",
+        )
+
+        return
+
+    preview = dataset.preview.copy()
+
+    ####################################################################
+    # Controls
+    ####################################################################
+
+    left, middle, right = st.columns([1, 1.2, 1])
+
+    with left:
+
+        rows = st.selectbox(
+            "Rows",
+            [5, 10, 20, 50, 100],
+            index=1,
+        )
+
+    with middle:
+
+        search = st.text_input(
+            "Search Columns",
+            placeholder="Column name...",
+        )
+
+    with right:
+
+        column_options = ["All Columns"] + list(preview.columns)
+
+        selected_columns = st.multiselect(
+            "Columns",
+            column_options,
+            default=["All Columns"],
+        )
+
+    ####################################################################
+    # Column Search
+    ####################################################################
+
+    if search:
+
+        cols = [
+            c
+            for c in preview.columns
+            if search.lower() in c.lower()
+        ]
+
+        if cols:
+
+            preview = preview[cols]
+
+        else:
+
+            st.warning("No matching columns found.")
+
+            return
+
+    ####################################################################
+    # Column Selection
+    ####################################################################
+
+    if (
+        "All Columns" not in selected_columns
+        and len(selected_columns) > 0
+    ):
+
+        preview = preview[selected_columns]
+
+    ####################################################################
+    # Tabs
+    ####################################################################
+
+    tab1, tab2, tab3, tab4 = st.tabs(
+        [
+            "Head",
+            "Tail",
+            "Random Sample",
+            "Statistics",
+        ]
+    )
+
+    with tab1:
+
+        st.dataframe(
+            preview.head(rows),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with tab2:
+
+        st.dataframe(
+            preview.tail(rows),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with tab3:
+
+        sample_size = min(rows, len(preview))
+
+        st.dataframe(
+            preview.sample(sample_size, random_state=42),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with tab4:
+
+        numeric = preview.select_dtypes(include="number")
+
+        if numeric.empty:
+
+            st.info("No numerical columns available.")
+
+        else:
+
+            st.dataframe(
+                numeric.describe().T,
+                use_container_width=True,
+            )
+
+    st.divider()
+
+    ####################################################################
+    # Dataset Information
+    ####################################################################
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+
+        st.metric(
+            "Rows",
+            f"{dataset.rows:,}",
+        )
+
+    with col2:
+
+        st.metric(
+            "Columns",
+            dataset.columns,
+        )
+
+    with col3:
+
+        st.metric(
+            "Memory Usage",
+            dataset.memory_usage,
+        )
+
+    with col4:
+
+        st.metric(
+            "Health Score",
+            f"{dataset.health_score}%",
+        )
+
+    st.divider()
+
+    ####################################################################
+    # Download
+    ####################################################################
+
+    _download_preview(preview)

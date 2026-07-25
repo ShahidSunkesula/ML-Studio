@@ -1,3 +1,15 @@
+"""
+upload.py
+
+Dataset upload component.
+
+Author:
+    Shahid
+
+Project:
+    ML Studio
+"""
+
 import streamlit as st
 
 
@@ -14,15 +26,3 @@ def render_upload_section():
     )
 
     return uploaded_file
-
-
-def render_dataset_summary(dataset):
-    pass
-
-
-def render_dataset_preview(dataset):
-    pass
-
-
-def render_column_summary(dataset):
-    pass

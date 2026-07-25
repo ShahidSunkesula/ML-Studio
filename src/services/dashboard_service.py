@@ -11,75 +11,16 @@ Project:
     ML Studio
 """
 
-from dataclasses import dataclass
-from typing import Any
-
 from src.config.pages import Pages
 from src.core.history_manager import HistoryManager
 from src.core.pipeline_manager import PipelineManager
 from src.core.session_manager import SessionManager
 from src.core.workflow_manager import WorkflowManager
-
-
-# ==========================================================
-# Data Models
-# ==========================================================
-
-
-@dataclass
-class DatasetSummary:
-    """
-    Summary information about the loaded dataset.
-    """
-
-    name: str | None
-    rows: int
-    columns: int
-    missing_values: int
-    duplicate_rows: int
-    memory_usage: str
-
-
-@dataclass
-class QuickAction:
-    """
-    Dashboard quick action.
-    """
-
-    label: str
-    icon: str
-    page: str
-    enabled: bool
-
-
-@dataclass
-class DashboardData:
-    """
-    Dashboard information.
-    """
-
-    dataset_summary: DatasetSummary
-
-    model_count: int
-
-    workflow: dict[str, bool]
-    completed_steps: int
-    total_steps: int
-    workflow_progress: float
-
-    pipeline_steps: list[dict[str, Any]]
-    pipeline_step_count: int
-
-    recent_history: list[dict[str, Any]]
-    recent_activity_count: int
-
-    primary_action: QuickAction
-    secondary_actions: list[QuickAction]
-
-
-# ==========================================================
-# Dashboard Service
-# ==========================================================
+from src.schemas.dashboard import (
+    DashboardData,
+    DatasetSummary,
+    QuickAction,
+)
 
 
 class DashboardService:
@@ -157,7 +98,7 @@ class DashboardService:
         recent_activity_count = len(recent_history)
 
         # ======================================================
-        # Primary Action
+        # Quick Actions
         # ======================================================
 
         if dataset is None:
@@ -178,26 +119,19 @@ class DashboardService:
                 enabled=True,
             )
 
-        # ======================================================
-        # Secondary Actions
-        # ======================================================
-
         secondary_actions = [
-
             QuickAction(
                 label="History",
                 icon="🕘",
                 page="",
                 enabled=False,
             ),
-
             QuickAction(
                 label="Settings",
                 icon="⚙️",
                 page="",
                 enabled=False,
             ),
-
         ]
 
         # ======================================================
