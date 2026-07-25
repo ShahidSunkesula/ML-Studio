@@ -22,13 +22,26 @@ class SessionManager:
     """
 
     DEFAULT_STATE = {
-        "dataset": None,
-        "target_column": None,
-        "problem_type": None,
-        "pipeline": [],
-        "history": [],
-        "workflow": {},
-        "trained_model": None,
+    # Dataset
+    "dataset": None,
+    "dataset_name": None,
+    "last_uploaded_file": None,
+
+    # Project Configuration
+    "target_column": None,
+    "problem_type": None,
+
+    # Pipeline
+    "pipeline": [],
+
+    # History
+    "history": [],
+
+    # Workflow
+    "workflow": {},
+
+    # Models
+    "trained_model": None,
     }
 
     @classmethod

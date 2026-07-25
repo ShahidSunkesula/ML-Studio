@@ -11,6 +11,7 @@ Project:
     ML Studio
 """
 
+from src.core.app_initializer import initialize_page
 from src.services.dashboard_service import DashboardService
 from src.ui.components.dashboard import (
     render_dataset_summary,
@@ -20,18 +21,31 @@ from src.ui.components.dashboard import (
     render_recent_activity,
     render_workflow_progress,
 )
-from src.ui.layouts.page_layout import (
+from src.ui.page_layout import (
     PageConfig,
     render_page_layout,
 )
-from src.core.app_initializer import initialize_page
+
+
+# ==========================================================
+# Initialize Page
+# ==========================================================
 
 initialize_page()
+
+
+# ==========================================================
+# Main
+# ==========================================================
 
 def main() -> None:
     """
     Render the Dashboard page.
     """
+
+    # ------------------------------------------------------
+    # Page Header
+    # ------------------------------------------------------
 
     render_page_layout(
         PageConfig(
@@ -41,20 +55,55 @@ def main() -> None:
         )
     )
 
+    # ------------------------------------------------------
+    # Dashboard Data
+    # ------------------------------------------------------
+
     dashboard = DashboardService.get_dashboard_data()
+
+    # ------------------------------------------------------
+    # Project Overview
+    # ------------------------------------------------------
 
     render_project_overview(dashboard)
 
-    render_quick_actions(dashboard)
+    # ------------------------------------------------------
+    # Quick Actions
+    # ------------------------------------------------------
+
+    render_quick_actions(
+        primary_action=dashboard.primary_action,
+        secondary_actions=dashboard.secondary_actions,
+    )
+
+    # ------------------------------------------------------
+    # Dataset Summary
+    # ------------------------------------------------------
 
     render_dataset_summary(dashboard)
 
+    # ------------------------------------------------------
+    # Workflow Progress
+    # ------------------------------------------------------
+
     render_workflow_progress(dashboard)
+
+    # ------------------------------------------------------
+    # Pipeline Summary
+    # ------------------------------------------------------
 
     render_pipeline_summary(dashboard)
 
+    # ------------------------------------------------------
+    # Recent Activity
+    # ------------------------------------------------------
+
     render_recent_activity(dashboard)
 
+
+# ==========================================================
+# Entry Point
+# ==========================================================
 
 if __name__ == "__main__":
     main()

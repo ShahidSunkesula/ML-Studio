@@ -14,10 +14,16 @@ Project:
 from dataclasses import dataclass
 from typing import Any
 
+from src.config.pages import Pages
 from src.core.history_manager import HistoryManager
 from src.core.pipeline_manager import PipelineManager
 from src.core.session_manager import SessionManager
 from src.core.workflow_manager import WorkflowManager
+
+
+# ==========================================================
+# Data Models
+# ==========================================================
 
 
 @dataclass
@@ -35,12 +41,25 @@ class DatasetSummary:
 
 
 @dataclass
+class QuickAction:
+    """
+    Dashboard quick action.
+    """
+
+    label: str
+    icon: str
+    page: str
+    enabled: bool
+
+
+@dataclass
 class DashboardData:
     """
-    Container for all dashboard information.
+    Dashboard information.
     """
 
     dataset_summary: DatasetSummary
+
     model_count: int
 
     workflow: dict[str, bool]
@@ -54,7 +73,13 @@ class DashboardData:
     recent_history: list[dict[str, Any]]
     recent_activity_count: int
 
-    quick_actions: dict[str, bool]
+    primary_action: QuickAction
+    secondary_actions: list[QuickAction]
+
+
+# ==========================================================
+# Dashboard Service
+# ==========================================================
 
 
 class DashboardService:
@@ -65,10 +90,12 @@ class DashboardService:
     @staticmethod
     def get_dashboard_data() -> DashboardData:
         """
-        Collect all dashboard information required by the dashboard page.
+        Collect dashboard information.
         """
 
-        # ---------------- Dataset ----------------
+        # ======================================================
+        # Dataset
+        # ======================================================
 
         dataset = SessionManager.get("dataset")
         dataset_name = SessionManager.get("dataset_name")
@@ -95,7 +122,9 @@ class DashboardService:
                 memory_usage=f"{dataset.memory_usage(deep=True).sum() / 1024**2:.2f} MB",
             )
 
-        # ---------------- Workflow ----------------
+        # ======================================================
+        # Workflow
+        # ======================================================
 
         workflow = WorkflowManager.get_workflow()
 
@@ -104,18 +133,22 @@ class DashboardService:
         total_steps = len(workflow)
 
         workflow_progress = (
-            (completed_steps / total_steps) * 100
+            completed_steps / total_steps * 100
             if total_steps > 0
             else 0.0
         )
 
-        # ---------------- Pipeline ----------------
+        # ======================================================
+        # Pipeline
+        # ======================================================
 
         pipeline_steps = PipelineManager.get_pipeline()
 
         pipeline_step_count = len(pipeline_steps)
 
-        # ---------------- History ----------------
+        # ======================================================
+        # History
+        # ======================================================
 
         history = HistoryManager.get_history()
 
@@ -123,16 +156,53 @@ class DashboardService:
 
         recent_activity_count = len(recent_history)
 
-        # ---------------- Quick Actions ----------------
+        # ======================================================
+        # Primary Action
+        # ======================================================
 
-        quick_actions = {
-            "upload_dataset": dataset is None,
-            "continue_project": dataset is not None,
-            "view_history": True,
-            "settings": True,
-        }
+        if dataset is None:
 
-        # ---------------- Return ----------------
+            primary_action = QuickAction(
+                label="Upload Dataset",
+                icon="📂",
+                page=Pages.DATASET,
+                enabled=True,
+            )
+
+        else:
+
+            primary_action = QuickAction(
+                label="Open Dataset",
+                icon="📂",
+                page=Pages.DATASET,
+                enabled=True,
+            )
+
+        # ======================================================
+        # Secondary Actions
+        # ======================================================
+
+        secondary_actions = [
+
+            QuickAction(
+                label="History",
+                icon="🕘",
+                page="",
+                enabled=False,
+            ),
+
+            QuickAction(
+                label="Settings",
+                icon="⚙️",
+                page="",
+                enabled=False,
+            ),
+
+        ]
+
+        # ======================================================
+        # Return
+        # ======================================================
 
         return DashboardData(
             dataset_summary=dataset_summary,
@@ -145,5 +215,6 @@ class DashboardService:
             pipeline_step_count=pipeline_step_count,
             recent_history=recent_history,
             recent_activity_count=recent_activity_count,
-            quick_actions=quick_actions,
+            primary_action=primary_action,
+            secondary_actions=secondary_actions,
         )
