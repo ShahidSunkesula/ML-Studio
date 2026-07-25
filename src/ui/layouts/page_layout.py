@@ -11,20 +11,43 @@ Project:
     ML Studio
 """
 
+from dataclasses import dataclass
+
 import streamlit as st
 
 
-def render_page_layout(
-    title: str,
-    description: str | None = None,
-) -> None:
+@dataclass
+class PageConfig:
     """
-    Render the standard page layout.
+    Configuration for a page layout.
     """
 
-    st.title(title)
+    title: str
+    description: str | None = None
+    icon: str | None = None
+    show_divider: bool = True
 
-    if description:
-        st.write(description)
 
-    st.divider()
+def render_page_layout(config: PageConfig) -> None:
+    """
+    Render a standardized page layout.
+
+    Parameters
+    ----------
+    config : PageConfig
+        Configuration containing page metadata.
+    """
+
+    # ---------- Page Title ----------
+    if config.icon:
+        st.title(f"{config.icon} {config.title}")
+    else:
+        st.title(config.title)
+
+    # ---------- Description ----------
+    if config.description:
+        st.caption(config.description)
+
+    # ---------- Divider ----------
+    if config.show_divider:
+        st.divider()
