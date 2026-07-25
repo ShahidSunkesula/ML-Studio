@@ -28,6 +28,7 @@ class DashboardData:
     dataset_name: str | None
     dataset_rows: int
     dataset_columns: int
+    model_count: int
     workflow: dict
     pipeline: list
     history: list
@@ -57,6 +58,7 @@ class DashboardService:
             dataset_name=dataset_name,
             dataset_rows=rows,
             dataset_columns=columns,
+            model_count=0,
             workflow=WorkflowManager.get_workflow(),
             pipeline=PipelineManager.get_pipeline(),
             history=HistoryManager.get_history(),
