@@ -19,7 +19,8 @@ from src.core.workflow_manager import WorkflowManager
 from src.core.pipeline_manager import PipelineManager
 from src.core.history_manager import HistoryManager
 from src.core.logger import get_logger
-
+from src.ui.theme import apply_theme
+from src.ui.components.sidebar import render_sidebar
 
 # ==========================================================
 # Logger
@@ -51,24 +52,12 @@ HistoryManager.initialize()
 
 logger.info("ML Studio started successfully.")
 
-
+apply_theme()
 # ==========================================================
 # Sidebar
 # ==========================================================
 
-with st.sidebar:
-    st.title(APP_NAME)
-    st.caption(f"Version {APP_VERSION}")
-
-    st.divider()
-
-    st.success("Core initialized successfully")
-
-    st.divider()
-
-    st.write("Navigate using the pages on the left.")
-
-
+render_sidebar()
 # ==========================================================
 # Main Page
 # ==========================================================
