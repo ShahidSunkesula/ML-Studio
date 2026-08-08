@@ -9,7 +9,6 @@ from src.core.pipeline_manager import PipelineManager
 from src.core.session_manager import SessionManager
 from src.core.workflow_manager import WorkflowManager
 from src.ui.sidebar import render_sidebar
-from src.config.theme import apply_theme
 from src.ui.theme import apply_theme
 
 
